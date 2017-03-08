@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-mdadm
+- include: debian.yml
+  when: ansible_os_family == "Debian"
+
+- include: arrays.yml
