@@ -157,7 +157,7 @@ galaxy_info:
   #  - all
   #  - any
   - name: EL
-  #  versions:
+    versions:
   #  - all
   #  - 5
   #  - 6
