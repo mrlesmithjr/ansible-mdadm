@@ -1,0 +1,5 @@
+---
+- name: el | Installing mdadm
+  yum:
+    name: "mdadm"
+    state: "present"
