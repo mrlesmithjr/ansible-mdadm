@@ -28,6 +28,7 @@
 - name: arrays | Capturing Array Details
   command: "mdadm --detail --scan"
   register: "array_details"
+  changed_when: false
 
 # Creating raid arrays filesystem
 - name: arrays | Creating Array(s) Filesystem
