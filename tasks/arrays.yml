@@ -100,6 +100,12 @@
     path: /etc/mdadm/
     state: directory
 
+- name: arrays | Ensure /etc/mdadm/mdadm.conf file exists
+  copy:
+    content: ""
+    dest: /etc/mdadm/mdadm.conf
+    force: no
+
 # Updating /etc/mdadm/mdadm.conf in order to persist between reboots
 - name: arrays | Updating /etc/mdadm/mdadm.conf
   lineinfile:
