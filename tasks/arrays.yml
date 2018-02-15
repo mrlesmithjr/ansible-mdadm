@@ -97,6 +97,11 @@
         array_check.results[0].rc == 0 and
         array_removed.changed
 
+- name: arrays | Ensure /etc/mdadm/ directory exists
+  file:
+    path: /etc/mdadm/
+    state: directory
+
 # Updating /etc/mdadm/mdadm.conf in order to persist between reboots
 - name: arrays | Updating /etc/mdadm/mdadm.conf
   lineinfile:
