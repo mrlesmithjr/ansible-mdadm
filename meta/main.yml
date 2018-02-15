@@ -1,5 +1,5 @@
 galaxy_info:
-  author: Alex Ruiz Estradera
+  author: Larry Smith jr
   description: An [Ansible] role to install and manage [mdadm] raid arrays.
   # company: your company (optional)
 
