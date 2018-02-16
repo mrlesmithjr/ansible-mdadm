@@ -3,3 +3,7 @@
   yum:
     name: "mdadm"
     state: "present"
+
+- name: arrays | Set update_initramfs cmd to dracut -f 
+  set_fact:
+    update_initramfs: "dracut -f"

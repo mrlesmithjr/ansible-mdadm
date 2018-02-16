@@ -19,7 +19,7 @@
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
-  command: "update-initramfs -u"
+  command: "{{ update_initramfs }}"
   when: array_created.changed
 
 # Capture the raid array details to append to /etc/mdadm/mdadm.conf
@@ -129,7 +129,7 @@
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
-  command: "update-initramfs -u"
+  command: "{{ update_initramfs }}"
   when: array_removed.changed and ansible_os_family == "Debian"
 
 # Updates initramfs archives in /boot
