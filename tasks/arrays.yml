@@ -45,6 +45,7 @@
     src: "/dev/{{ item.name }}"
     fstype: "{{ item.filesystem }}"
     state: "mounted"
+    opts: "{{ item.opts | default(omit) }}"
   with_items: '{{ mdadm_arrays }}'
   when: item.state|lower == "present"
 
