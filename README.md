@@ -25,6 +25,7 @@ mdadm_arrays:
       - '/dev/sdc'
     # Define filesystem to partition array with
     filesystem: 'ext4'
+    filesystem_opts: ''
     # Define the array raid level
     # 0|1|4|5|6|10
     level: '1'
