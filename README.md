@@ -23,7 +23,7 @@ mdadm_arrays:
     devices:
       - '/dev/sdb'
       - '/dev/sdc'
-    # Define filesystem to partition array with
+    # Define filesystem to partition array with (optional)
     filesystem: 'ext4'
     filesystem_opts: ''
     # Define the array raid level
