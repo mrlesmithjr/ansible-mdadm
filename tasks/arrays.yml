@@ -37,7 +37,9 @@
     opts: "{{ item.filesystem_opts | default(omit) }}"
     dev: "/dev/{{ item.name }}"
   with_items: '{{ mdadm_arrays }}'
-  when: item.state|lower == "present"
+  when:
+  - item.state|lower == "present"
+  - item.filesystem is defined
 
 # Mounting raid arrays
 - name: arrays | Mounting Array(s)
@@ -50,6 +52,7 @@
   with_items: '{{ mdadm_arrays }}'
   when:
   - item.state|lower == "present"
+  - item.filesystem is defined
   - item.mountpoint is defined
 
 # Unmounting raid arrays in preparation of destroying
