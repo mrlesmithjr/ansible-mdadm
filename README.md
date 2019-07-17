@@ -1,5 +1,5 @@
-Role Name
-=========
+mrlesmithjr.mdadm
+=================
 
 An [Ansible] role to install and manage [mdadm] raid arrays.
 
