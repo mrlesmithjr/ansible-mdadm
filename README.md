@@ -59,7 +59,7 @@ Example Playbook
   become: true
   vars:
   roles:
-    - role: ansible-mdadm
+    - role: mrlesmithjr.mdadm
   tasks:
 ```
 
