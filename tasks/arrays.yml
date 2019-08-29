@@ -1,12 +1,12 @@
 ---
-# Checking for any existing raid arrays
+# Checking for the existence of the device in /dev, in case the user-provided
+# name is of the form /dev/md/<name>, which is a symlink to /dev/mdXXX, of
+# which /proc/mdstat only prints the latter.
 - name: arrays | Checking Status Of Array(s)
-  shell: "cat /proc/mdstat | grep {{ item.name }}"
+  stat:
+    path: "/dev/{{ item.name }}"
   register: "array_check"
-  changed_when: false
-  failed_when: false
   with_items: '{{ mdadm_arrays }}'
-  check_mode: no
 
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
@@ -16,7 +16,7 @@
   with_items: '{{ mdadm_arrays }}'
   when: >
         item.state|lower == "present" and
-        array_check.results[0].rc != 0
+        not array_check.results[0].stat.exists
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
