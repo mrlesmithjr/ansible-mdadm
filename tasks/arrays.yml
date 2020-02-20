@@ -46,11 +46,6 @@
   register: "array_uuid"
   with_items: '{{ mdadm_arrays }}'
 
-- debug: 
-    msg: '{{item.stdout}} - {{item.item.name}} - {{item.item}}'
-  with_items: '{{ array_uuid.results }}'
-  when: item.item.state|lower == "absent"
-
 # Mounting raid arrays
 - name: arrays | Mounting Array(s)
   mount:
