@@ -1,0 +1,3 @@
+update_initramfs: "update-initramfs -u"
+mdadm_conf: "/etc/mdadm/mdadm.conf"
+mdadm_conf_path: "/etc/mdadm"

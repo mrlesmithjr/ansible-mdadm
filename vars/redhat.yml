@@ -1,0 +1,2 @@
+update_initramfs: "dracut -f"
+mdadm_conf: "/etc/mdadm.conf"

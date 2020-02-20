@@ -41,19 +41,29 @@
   - item.state|lower == "present"
   - item.filesystem is defined
 
+- name: arrays | Get UUID
+  shell: "blkid /dev/{{ item.name }}| cut -d ' ' -f 2"
+  register: "array_uuid"
+  with_items: '{{ mdadm_arrays }}'
+
+- debug: 
+    msg: '{{item.stdout}} - {{item.item.name}} - {{item.item}}'
+  with_items: '{{ array_uuid.results }}'
+  when: item.item.state|lower == "absent"
+
 # Mounting raid arrays
 - name: arrays | Mounting Array(s)
   mount:
-    name: "{{ item.mountpoint }}"
-    src: "/dev/{{ item.name }}"
-    fstype: "{{ item.filesystem }}"
+    name: "{{ item.item.mountpoint }}"
+    src: "{{ item.stdout }}"
+    fstype: "{{ item.item.filesystem }}" 
     state: "mounted"
-    opts: "{{ item.opts | default(omit) }}"
-  with_items: '{{ mdadm_arrays }}'
+    opts: "{{ item.item.opts | default(omit) }}"
+  with_items: '{{ array_uuid.results }}'
   when:
-  - item.state|lower == "present"
-  - item.filesystem is defined
-  - item.mountpoint is defined
+    - item.item.state|lower == "present"
+    - item.item.filesystem is defined
+    - item.item.mountpoint is defined
 
 # Unmounting raid arrays in preparation of destroying
 - name: arrays | Unmounting Array(s)

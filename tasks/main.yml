@@ -1,15 +1,16 @@
 ---
 # tasks file for ansible-mdadm
 #
+- name: 'include os-specific vars'
+  include_vars: "{{ ansible_os_family | lower }}.yml"
 
-- include_tasks: debian.yml
-  when: ansible_os_family == "Debian"
-
-- include_tasks: el.yml
-  when: ansible_os_family == "RedHat"
+- name: Installing mdadm
+  package:
+    name: "mdadm"
 
 - include_tasks: wipe_disks.yml
   when: >
         mdadm_force_wipe is defined and
         mdadm_force_wipe
+
 - include_tasks: arrays.yml
