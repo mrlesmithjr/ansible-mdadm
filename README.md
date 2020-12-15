@@ -18,7 +18,7 @@ Role Variables
 # Define Raid Arrays to manage
 mdadm_arrays:
     # Define array name
-  - name: 'md0'
+  - name: 'raid1'
     # Define disk devices to assign to array
     devices:
       - '/dev/sdb'
@@ -31,7 +31,7 @@ mdadm_arrays:
     # 0|1|4|5|6|10
     level: '1'
     # Define mountpoint for array device (optional)
-    mountpoint: '/mnt/md0'
+    mountpoint: '/mnt/raid1'
     # Define if array should be present or absent
     state: 'present'
     # Set mount options (optional)
