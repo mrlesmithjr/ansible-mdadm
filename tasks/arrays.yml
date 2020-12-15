@@ -1,7 +1,7 @@
 ---
 # Checking for any existing raid arrays
 - name: arrays | Checking Status Of Array(s)
-  shell: "cat /proc/mdstat | grep {{ item.name }}"
+  shell: "mdadm -D {{ item.name }}"
   register: "array_check"
   changed_when: false
   failed_when: false
