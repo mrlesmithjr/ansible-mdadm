@@ -11,7 +11,7 @@
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
 - name: arrays | Creating Array(s)
-  shell: "yes | mdadm --create /dev/{{ item.name }} --level={{ item.level }} --raid-devices={{ item.devices|count }} {{ item.devices| join (' ') }}"
+  shell: "yes | mdadm --create /dev/md/{{ item.name }} --level={{ item.level }} --raid-devices={{ item.devices|count }} {{ item.devices| join (' ') }}"
   register: "array_created"
   with_items: '{{ mdadm_arrays }}'
   when: >
@@ -35,7 +35,7 @@
   filesystem:
     fstype: "{{ item.filesystem }}"
     opts: "{{ item.filesystem_opts | default(omit) }}"
-    dev: "/dev/{{ item.name }}"
+    dev: "/dev/md/{{ item.name }}"
   with_items: '{{ mdadm_arrays }}'
   when:
   - item.state|lower == "present"
@@ -45,7 +45,7 @@
 - name: arrays | Mounting Array(s)
   mount:
     name: "{{ item.mountpoint }}"
-    src: "/dev/{{ item.name }}"
+    src: "/dev/md/{{ item.name }}"
     fstype: "{{ item.filesystem }}"
     state: "mounted"
     opts: "{{ item.opts | default(omit) }}"
@@ -59,7 +59,7 @@
 - name: arrays | Unmounting Array(s)
   mount:
     name: "{{ item.mountpoint }}"
-    src: "/dev/{{ item.name }}"
+    src: "/dev/md/{{ item.name }}"
     state: "unmounted"
   with_items: '{{ mdadm_arrays }}'
   when:
@@ -68,7 +68,7 @@
 
 # Stopping raid arrays in preparation of destroying
 - name: arrays | Stopping Array(s)
-  command: "mdadm --stop /dev/{{ item.name }}"
+  command: "mdadm --stop /dev/md/{{ item.name }}"
   register: "array_stopped"
   with_items: '{{ mdadm_arrays }}'
   when: >
@@ -77,7 +77,7 @@
 
 # Removing raid arrays
 - name: arrays | Removing Array(s)
-  command: "mdadm --remove /dev/{{ item.name }}"
+  command: "mdadm --remove /dev/md/{{ item.name }}"
   register: "array_removed"
   with_items: '{{ mdadm_arrays }}'
   when: >
@@ -132,8 +132,8 @@
 - name: arrays | Updating {{ mdadm_conf }}
   lineinfile:
     dest: "{{ mdadm_conf }}"
-    regexp: "^ARRAY /dev/{{ item.name }}"
-    line: "ARRAY /dev/{{ item.name }}"
+    regexp: "^ARRAY /dev/md/{{ item.name }}"
+    line: "ARRAY /dev/md/{{ item.name }}"
     state: "absent"
   with_items: '{{ mdadm_arrays }}'
   when: >
