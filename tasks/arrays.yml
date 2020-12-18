@@ -1,12 +1,15 @@
 ---
 # Checking for any existing raid arrays
 - name: arrays | Checking Status Of Array(s)
-  shell: "mdadm -D {{ item.name }}"
+  shell: "mdadm -D /dev/md/{{ item.name }}"
   register: "array_check"
   changed_when: false
   failed_when: false
   with_items: '{{ mdadm_arrays }}'
   check_mode: no
+
+- debug:
+    var: array_check
 
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
