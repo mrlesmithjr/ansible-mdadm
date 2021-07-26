@@ -142,15 +142,15 @@
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
   command: "{{ update_initramfs }}"
-  when: array_removed.changed and ansible_os_family == "Debian"
+  when: array_removed.changed and ansible_facts.os_family == "Debian"
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
   command: "mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname -r)-backup.img"
-  when: array_removed.changed and ansible_os_family == "RedHat"
+  when: array_removed.changed and ansible_facts.os_family == "RedHat"
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
   command: "dracut /boot/initramfs-$(uname -r).img $(uname -r)"
-  when: array_removed.changed and ansible_os_family == "RedHat"
+  when: array_removed.changed and ansible_facts.os_family == "RedHat"
 
