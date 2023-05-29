@@ -1,65 +1,23 @@
-mrlesmithjr.mdadm
-=================
+# mrlesmithjr.mdadm
 
-An [Ansible] role to install and manage [mdadm] raid arrays.
+An [Ansible](https://www.ansible.com) role to install and manage [mdadm](https://linux.die.net/man/8/mdadm) raid arrays.
 
-Requirements
-------------
+## Requirements
 
 - Available unpartitioned disk devices
 
-Role Variables
---------------
+## Role Variables
 
-```
----
-# defaults file for ansible-mdadm
-#
-# Define Raid Arrays to manage
-#
-# Example RAID1:
-# mdadm_arrays:
-#   # Define array name
-# - name: 'md0'
-#   # Define disk devices to assign to array
-#   devices:
-#     - '/dev/sdb'
-#     - '/dev/sdc'
-#   # Define filesystem to partition array with
-#   filesystem: 'ext4'
-#   # Define the array raid level
-#   # 0|1|4|5|6|10
-#   level: '1'
-#   # Define mountpoint for array device
-#   mountpoint: '/mnt/md0'
-#   # Define if array should be present or absent
-#   state: 'present'
-#   # Set mount options (optional)
-#   opts: 'noatime'
-#
-# Example RAID5:
-# mdadm_arrays:
-# - name: 'md0'
-#   devices:
-#     - '/dev/sdb'
-#     - '/dev/sdc'
-#     - '/dev/sdd'
-#   filesystem: 'ext4'
-#   level: '5'
-#   mountpoint: '/mnt/md0'
-#   state: 'present'
-mdadm_arrays: []
-```
+[defaults/main.yml](defaults/main.yml)
 
-Dependencies
-------------
+
+## Dependencies
 
 None
 
-Example Playbook
-----------------
+## Example Playbook
 
-```
+```yaml
 - hosts: all
   become: true
   vars:
@@ -68,21 +26,16 @@ Example Playbook
   tasks:
 ```
 
-License
--------
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
 Larry Smith Jr.
-- [@mrlesmithjr]
-- [EverythingShouldBeVirtual]
-- mrlesmithjr [at] gmail.com
 
-[@mrlesmithjr]: <https://www.twitter.com/mrlesmithjr>
-[EverythingShouldBeVirtual]: <http://www.everythingshouldbevirtual.com>
+- [@mrlesmithjr](https://twitter.com/mrlesmithjr)
+- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)
+- [http://everythingshouldbevirtual.com](http://everythingshouldbevirtual.com)
 
-[mdadm]: <https://linux.die.net/man/8/mdadm>
-[Ansible]: <https://www.ansible.com>
+<a href="https://www.buymeacoffee.com/mrlesmithjr" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
