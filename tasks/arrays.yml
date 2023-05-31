@@ -11,7 +11,7 @@
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
 - name: arrays | Creating Array(s)
-  shell: "yes | mdadm --create /dev/{{ item.name }} --level={{ item.level }} --raid-devices={{ item.devices|count }} {{ item.devices| join (' ') }}"
+  shell: "yes | mdadm --create /dev/{{ item.name }} --level={{ item.level }} --chunk={{item.chunk_size|default(512)}} --raid-devices={{ item.devices|count }} {{ item.devices| join (' ') }}"
   register: "array_created"
   with_items: '{{ mdadm_arrays }}'
   when: >
