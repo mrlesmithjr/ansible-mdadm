@@ -11,12 +11,12 @@
 # Creating raid arrays
 # We pass yes in order to accept any questions prompted for yes|no
 - name: arrays | Creating Array(s)
-  shell: "yes | mdadm --create /dev/{{ item.name }} --level={{ item.level }} --chunk={{item.chunk_size|default(512K)}} --metadata={{ item.raid_metadata_version | default(1.2) }} --raid-devices={{ item.devices|count }} {{ item.devices| join (' ') }}"
+  shell: "yes | mdadm --create /dev/{{ item.1.name }} --level={{ item.1.level }} --chunk={{item.1.chunk_size|default(512K)}} --metadata={{ item.1.raid_metadata_version | default(1.2) }} --raid-devices={{ item.1.devices|count }} {{ item.1.devices| join (' ') }}"
   register: "array_created"
-  with_items: '{{ mdadm_arrays }}'
+  with_indexed_items: '{{ mdadm_arrays }}'
   when: >
-        item.state|lower == "present" and
-        array_check.results[0].rc != 0
+        item.1.state|lower == "present" and
+        array_check.results[item.0].rc != 0
 
 # Updates initramfs archives in /boot
 - name: arrays | Updating Initramfs
@@ -26,9 +26,10 @@
 # Capture the raid array details to append to mdadm.conf
 # in order to persist between reboots
 - name: arrays | Capturing Array Details
-  command: "mdadm --detail --scan"
+  command: "mdadm --detail --scan /dev/{{ item.name }}"
   register: "array_details"
   changed_when: false
+  with_items: '{{ mdadm_arrays }}'
 
 # Creating raid arrays filesystem
 - name: arrays | Creating Array(s) Filesystem
@@ -123,9 +124,9 @@
   lineinfile:
     dest: "{{ mdadm_conf }}"
     regexp: "^{{ item }}"
-    line: "{{ item }}"
+    line: "{{ items.stdout }}"
     state: "present"
-  with_items: '{{ array_details.stdout_lines }}'
+  with_items: '{{ array_details.results }}'
   when: array_created.changed
 
 # Updating mdadm.conf in order to not persist between reboots
