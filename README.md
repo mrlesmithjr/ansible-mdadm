@@ -17,14 +17,40 @@ None
 
 ## Example Playbook
 
+### Manual configuration
 ```yaml
 - hosts: all
   become: true
   vars:
+    mdadm_arrays:
+      - name: md200
+        devices:
+          - /dev/nvme0n1
+          - /dev/nvme1n1
+        filesystem: lvm
+        level: 5
+        state: present
   roles:
     - role: ansible-mdadm
-  tasks:
 ```
+
+### Auto-detection mode
+```yaml
+- hosts: all
+  become: true
+  vars:
+    mdadm_auto_detect_arrays: true
+    mdadm_auto_detect_config:
+      - name: md200
+        filesystem: lvm
+        level: 5
+        state: present
+        min_disks: 3
+  roles:
+    - role: ansible-mdadm
+```
+
+Note: Auto-detection will automatically use all unused disks (not mounted, not in RAID, not in LVM, not formatted) if `mdadm_arrays` is empty and `mdadm_auto_detect_arrays` is true.
 
 ## License
 

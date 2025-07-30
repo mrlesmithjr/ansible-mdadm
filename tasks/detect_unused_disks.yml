@@ -1,0 +1,48 @@
+---
+# Detect unused disks that can be used for RAID arrays
+# This task will identify disks that are:
+# - Not mounted
+# - Not part of existing RAID arrays
+# - Not used in LVM
+# - Not formatted with a filesystem
+
+- name: detect_unused_disks | Get all block devices
+  shell: lsblk -ln -o NAME,TYPE,MOUNTPOINT,FSTYPE | grep -E '^[a-z]+[0-9]*\s+disk\s*$' | awk '{print "/dev/" $1}'
+  register: all_disks
+  changed_when: false
+
+- name: detect_unused_disks | Get mounted devices
+  shell: mount | awk '{print $1}' | grep '^/dev/' | sort | uniq
+  register: mounted_devices
+  changed_when: false
+
+- name: detect_unused_disks | Get devices used in existing RAID arrays
+  shell: cat /proc/mdstat | grep -oE 'sd[a-z]+[0-9]*|nvme[0-9]+n[0-9]+' | sed 's|^|/dev/|' | sort | uniq
+  register: raid_devices
+  changed_when: false
+  failed_when: false
+
+- name: detect_unused_disks | Get devices used in LVM
+  shell: pvs --noheadings -o pv_name 2>/dev/null | tr -d ' ' | sort | uniq
+  register: lvm_devices
+  changed_when: false
+  failed_when: false
+
+- name: detect_unused_disks | Get devices with filesystem
+  shell: blkid | cut -d: -f1 | sort | uniq
+  register: formatted_devices
+  changed_when: false
+  failed_when: false
+
+- name: detect_unused_disks | Filter unused disks
+  set_fact:
+    unused_disks: "{{ all_disks.stdout_lines | 
+      difference(mounted_devices.stdout_lines | default([])) |
+      difference(raid_devices.stdout_lines | default([])) |
+      difference(lvm_devices.stdout_lines | default([])) |
+      difference(formatted_devices.stdout_lines | default([])) }}"
+
+- name: detect_unused_disks | Debug unused disks found
+  debug:
+    msg: "Unused disks detected: {{ unused_disks }}"
+  when: unused_disks | length > 0
