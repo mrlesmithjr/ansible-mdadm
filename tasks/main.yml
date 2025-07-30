@@ -12,4 +12,18 @@
   when: >
         mdadm_force_wipe is defined and
         mdadm_force_wipe
+
+- include_tasks: detect_unused_disks.yml
+  when: >
+        mdadm_auto_detect_arrays and
+        (mdadm_arrays | length == 0)
+
+- name: main | Set auto-detected arrays
+  set_fact:
+    mdadm_arrays: "{{ mdadm_auto_detect_config | map('combine', {'devices': unused_disks}) | list }}"
+  when: >
+        mdadm_auto_detect_arrays and
+        (mdadm_arrays | length == 0) and
+        (unused_disks | length >= mdadm_auto_detect_config[0].min_disks)
+
 - include_tasks: arrays.yml

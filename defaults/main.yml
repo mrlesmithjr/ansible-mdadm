@@ -35,3 +35,14 @@
 #   mountpoint: '/mnt/md0'
 #   state: 'present'
 mdadm_arrays: []
+
+# Auto-detection settings
+mdadm_auto_detect_arrays: false
+mdadm_auto_detect_config:
+  # Default configuration for auto-detected arrays
+  - name: md200
+    filesystem: lvm
+    level: 5
+    state: present
+    # Minimum number of disks required for auto-detection
+    min_disks: 3
