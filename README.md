@@ -17,7 +17,7 @@ None
 
 ## Example Playbook
 
-### Manual configuration
+### Manual device configuration
 ```yaml
 - hosts: all
   become: true
@@ -30,6 +30,7 @@ None
         filesystem: lvm
         level: 5
         state: present
+        auto_detect: false  # default, can be omitted
   roles:
     - role: ansible-mdadm
 ```
@@ -39,18 +40,44 @@ None
 - hosts: all
   become: true
   vars:
-    mdadm_auto_detect_arrays: true
-    mdadm_auto_detect_config:
+    mdadm_arrays:
       - name: md200
+        devices: []  # empty list for auto-detection
         filesystem: lvm
         level: 5
         state: present
+        auto_detect: true
+        min_disks: 3  # minimum number of disks required
+  roles:
+    - role: ansible-mdadm
+```
+
+### Mixed configuration
+```yaml
+- hosts: all
+  become: true
+  vars:
+    mdadm_arrays:
+      - name: md0
+        devices:
+          - /dev/sdb
+          - /dev/sdc
+        filesystem: ext4
+        level: 1
+        state: present
+        auto_detect: false
+      - name: md200
+        devices: []
+        filesystem: lvm
+        level: 5
+        state: present
+        auto_detect: true
         min_disks: 3
   roles:
     - role: ansible-mdadm
 ```
 
-Note: Auto-detection will automatically use all unused disks (not mounted, not in RAID, not in LVM, not formatted) if `mdadm_arrays` is empty and `mdadm_auto_detect_arrays` is true.
+**Note**: Auto-detection will automatically use all unused disks (not mounted, not in RAID, not in LVM, not formatted) when `auto_detect: true` and `devices: []`. Setting both `auto_detect: true` and defining `devices` will result in an error.
 
 ## License
 
