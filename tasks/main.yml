@@ -13,17 +13,49 @@
         mdadm_force_wipe is defined and
         mdadm_force_wipe
 
-- include_tasks: detect_unused_disks.yml
+- name: main | Validate auto_detect configuration
+  fail:
+    msg: "Error: auto_detect is set to true but devices are also defined for array {{ item.name }}. Use either devices OR auto_detect, not both."
+  with_items: "{{ mdadm_arrays }}"
   when: >
-        mdadm_auto_detect_arrays and
-        (mdadm_arrays | length == 0)
+        item.auto_detect | default(false) and
+        item.devices is defined and
+        item.devices | length > 0
 
-- name: main | Set auto-detected arrays
-  set_fact:
-    mdadm_arrays: "{{ mdadm_auto_detect_config | map('combine', {'devices': unused_disks}) | list }}"
+- include_tasks: detect_unused_disks.yml
+  when: mdadm_arrays | selectattr('auto_detect', 'defined') | selectattr('auto_detect', 'equalto', true) | list | length > 0
+
+- name: main | Validate sufficient disks for auto-detection
+  fail:
+    msg: "Error: Not enough unused disks found for auto-detection. Found {{ unused_disks | length }} disks, but {{ item.name }} requires at least {{ item.min_disks | default(3) }} disks."
+  with_items: "{{ mdadm_arrays }}"
   when: >
-        mdadm_auto_detect_arrays and
-        (mdadm_arrays | length == 0) and
-        (unused_disks | length >= mdadm_auto_detect_config[0].min_disks)
+        item.auto_detect | default(false) and
+        (item.devices is not defined or item.devices | length == 0) and
+        unused_disks is defined and
+        unused_disks | length < item.min_disks | default(3)
+
+- name: main | Set auto-detected devices for arrays with auto_detect
+  set_fact:
+    mdadm_arrays: "{{ mdadm_arrays_updated }}"
+  vars:
+    mdadm_arrays_updated: >-
+      {%- set result = [] -%}
+      {%- for array in mdadm_arrays -%}
+        {%- if array.auto_detect | default(false) and (array.devices is not defined or array.devices | length == 0) -%}
+          {%- if unused_disks | length >= array.min_disks | default(3) -%}
+            {%- set updated_array = array | combine({'devices': unused_disks}) -%}
+            {%- set _ = result.append(updated_array) -%}
+          {%- else -%}
+            {%- set _ = result.append(array) -%}
+          {%- endif -%}
+        {%- else -%}
+          {%- set _ = result.append(array) -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ result }}
+  when: >
+        unused_disks is defined and
+        mdadm_arrays | selectattr('auto_detect', 'defined') | selectattr('auto_detect', 'equalto', true) | list | length > 0
 
 - include_tasks: arrays.yml
