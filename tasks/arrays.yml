@@ -20,7 +20,7 @@
       set -o pipefail &&
       yes | mdadm --create /dev/{{ item.name }}
       --level={{ item.level }}
-      {% if item.level != 1 %}--chunk={{ item.chunk_size | default('512K') }}{% endif %}
+      {% if item.level | int != 1 %}--chunk={{ item.chunk_size | default('512K') }}{% endif %}
       --metadata={{ item.raid_metadata_version | default(1.2) }}
       --raid-devices={{ item.devices | count }}
       {{ item.devices | join(' ') }}
