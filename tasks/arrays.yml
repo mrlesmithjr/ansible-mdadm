@@ -24,6 +24,7 @@
       --metadata={{ item.raid_metadata_version | default(1.2) }}
       --raid-devices={{ item.devices | count }}
       {{ item.devices | join(' ') }}
+      {% if item.assume_clean | default(false) | bool %} --assume-clean {% endif %}
     executable: /bin/bash
   register: "array_created"
   changed_when: true
