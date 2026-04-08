@@ -1,69 +1,122 @@
-# mrlesmithjr.mdadm
+# ansible-mdadm
 
-An [Ansible](https://www.ansible.com) role to install and manage [mdadm](https://linux.die.net/man/8/mdadm) raid arrays.
+An [Ansible](https://www.ansible.com) role to install and manage [mdadm](https://linux.die.net/man/8/mdadm) software RAID arrays.
 
-## ⚠️ Important: Ansible Galaxy Role Name
+> Used by [OpenStack Kayobe](https://docs.openstack.org/kayobe/latest/) for software RAID management.
 
-**As of December 2025**, this role is available on Ansible Galaxy as:
+## Ansible Galaxy
 
-```yaml
-- src: mrlesmithjr.mdadm
+```bash
+ansible-galaxy install mrlesmithjr.mdadm
 ```
 
-The previous duplicate role name (`mrlesmithjr.ansible-mdadm`) was removed and
-consolidated into this single role. If you were using `mrlesmithjr.ansible-mdadm`,
-please update your `requirements.yml` to use `mrlesmithjr.mdadm`.
+> **Note:** As of December 2025, the canonical Galaxy name is `mrlesmithjr.mdadm`.
+> If you were using `mrlesmithjr.ansible-mdadm`, update your `requirements.yml`.
 
-**Note:** This role is used by [OpenStack Kayobe](https://docs.openstack.org/kayobe/latest/)
-for software RAID management.
-
-### Historical Download Statistics
-
-Prior to consolidation, this role had accumulated significant usage:
+<details>
+<summary>Historical download statistics</summary>
 
 | Role Name | Downloads (as of Dec 2025) |
 |-----------|---------------------------|
 | `mrlesmithjr.mdadm` | 632,067 |
 | `mrlesmithjr.ansible-mdadm` | 8,439 |
-| **Combined Total** | **640,506** |
+| **Combined** | **640,506** |
 
-Due to Ansible Galaxy limitations, download counts reset when roles are re-imported.
-The historical data above represents the actual community usage of this role.
+Download counts reset when roles are re-imported to Galaxy. These figures represent actual historical usage.
+</details>
+
+## Supported Platforms
+
+| Platform | Versions |
+|----------|----------|
+| Ubuntu | 20.04, 22.04, 24.04 |
+| Debian | 11, 12 |
+| Rocky Linux / RHEL | 8, 9 |
+| Fedora | 39+ |
 
 ## Requirements
 
-- Available unpartitioned disk devices
+- Available unpartitioned disk devices to assign to arrays
+- Root / `become: true`
 
-## Role Variables
+## Quick Start
 
-[defaults/main.yml](defaults/main.yml)
-
-
-## Dependencies
-
-None
-
-## Example Playbook
+### RAID 1 (Mirror)
 
 ```yaml
+---
 - hosts: all
   become: true
   vars:
+    mdadm_arrays:
+      - name: md0
+        devices:
+          - /dev/sdb
+          - /dev/sdc
+        filesystem: ext4
+        level: '1'
+        mountpoint: /mnt/md0
+        state: present
   roles:
     - role: mrlesmithjr.mdadm
-  tasks:
 ```
+
+### RAID 5
+
+```yaml
+mdadm_arrays:
+  - name: md0
+    devices:
+      - /dev/sdb
+      - /dev/sdc
+      - /dev/sdd
+    filesystem: ext4
+    level: '5'
+    mountpoint: /mnt/md0
+    state: present
+```
+
+## Key Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `mdadm_arrays` | `[]` | List of RAID array definitions (see below) |
+
+### `mdadm_arrays` Structure
+
+```yaml
+mdadm_arrays:
+  - name: md0              # Array device name (/dev/md0)
+    devices:               # Block devices to include
+      - /dev/sdb
+      - /dev/sdc
+    filesystem: ext4       # Filesystem to create: ext4 | xfs | etc.
+    level: '1'             # RAID level: 0 | 1 | 4 | 5 | 6 | 10
+    mountpoint: /mnt/md0   # Where to mount the array
+    state: present         # present | absent
+    opts: noatime          # Mount options (optional)
+```
+
+See [defaults/main.yml](defaults/main.yml) for the full variable reference.
+
+## Testing
+
+```bash
+pip install molecule molecule-docker
+molecule test
+```
+
+## Support This Project
+
+This role has been downloaded over **640,000 times** from Ansible Galaxy.
+If your organization depends on it in production, consider
+[sponsoring its maintenance](https://github.com/sponsors/mrlesmithjr).
+Enterprise support tiers are available.
 
 ## License
 
 BSD
 
-## Author Information
+## Author
 
-Larry Smith Jr.
-
-- [@mrlesmithjr](https://twitter.com/mrlesmithjr)
-- [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)
-- [http://everythingshouldbevirtual.com](http://everythingshouldbevirtual.com)
-
-<a href="https://www.buymeacoffee.com/mrlesmithjr" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+Larry Smith Jr. — [everythingshouldbevirtual.com](http://everythingshouldbevirtual.com) · [mrlesmithjr@gmail.com](mailto:mrlesmithjr@gmail.com)
