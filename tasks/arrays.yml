@@ -36,11 +36,15 @@
     item.state | lower == "present" and
     array_check.results[0].rc != 0
 
-# Updates initramfs archives in /boot
-- name: Arrays | Updating Initramfs
-  ansible.builtin.command: "{{ update_initramfs }}"
-  changed_when: true
-  when: array_created.changed
+# Ensure mdadm.conf is copied into initramfs
+- name: arrays | Configure dracut to include mdadm.conf
+  ansible.builtin.copy:
+    content: |
+      # Ensure mdadm.conf is included
+      mdadmconf="yes"
+    dest: /etc/dracut.conf.d/mdadm.conf
+    mode: 0644
+  when: array_created.changed and ansible_facts.os_family == "RedHat"
 
 # Capture the raid array details to append to mdadm.conf
 # in order to persist between reboots
@@ -163,6 +167,12 @@
   with_items: '{{ mdadm_arrays }}'
   when: >
     item.state == "absent"
+
+# Updates initramfs archives in /boot
+- name: Arrays | Updating Initramfs
+  ansible.builtin.command: "{{ update_initramfs }}"
+  changed_when: true
+  when: array_created.changed
 
 # Updates initramfs archives in /boot
 - name: Arrays | Updating Initramfs (Debian)
