@@ -8,3 +8,10 @@
   ansible.builtin.set_fact:
     update_initramfs: "dracut -f"
     mdadm_conf: "/etc/mdadm.conf"
+
+- name: EL | Configure dracut to include mdadm.conf in initramfs
+  ansible.builtin.copy:
+    dest: /etc/dracut.conf.d/mdadm.conf
+    content: |
+      mdadmconf="yes"
+    mode: "0644"
