@@ -2,7 +2,7 @@
 # Checking for any existing raid arrays
 - name: Arrays | Checking Status Of Array(s)
   ansible.builtin.shell:
-    cmd: "set -o pipefail && cat /proc/mdstat | grep {{ item.name }}"
+    cmd: "set -o pipefail && cat /proc/mdstat | grep -w {{ item.name }}"
     executable: /bin/bash
   register: "array_check"
   changed_when: false
