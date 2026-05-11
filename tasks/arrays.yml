@@ -36,12 +36,6 @@
     item.state | lower == "present" and
     array_check.results[0].rc != 0
 
-# Updates initramfs archives in /boot
-- name: Arrays | Updating Initramfs
-  ansible.builtin.command: "{{ update_initramfs }}"
-  changed_when: true
-  when: array_created.changed
-
 # Capture the raid array details to append to mdadm.conf
 # in order to persist between reboots
 - name: Arrays | Capturing Array Details
@@ -151,6 +145,14 @@
     line: "{{ item }}"
     state: "present"
   with_items: '{{ array_details.stdout_lines }}'
+  when: array_created.changed
+
+# Rebuild initramfs AFTER mdadm.conf is written so the array definitions
+# are embedded in the initramfs and the kernel can identify arrays by name
+# on the next boot (without this, arrays are renamed md127 on EL hosts).
+- name: Arrays | Updating Initramfs
+  ansible.builtin.command: "{{ update_initramfs }}"
+  changed_when: true
   when: array_created.changed
 
 # Updating mdadm.conf in order to not persist between reboots
