@@ -95,6 +95,7 @@ mdadm_arrays:
     mountpoint: /mnt/md0   # Where to mount the array
     state: present         # present | absent
     opts: noatime          # Mount options (optional)
+    assume_clean: true     # Avoid initial resync
 ```
 
 See [defaults/main.yml](defaults/main.yml) for the full variable reference.
